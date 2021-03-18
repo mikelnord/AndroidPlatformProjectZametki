@@ -29,7 +29,7 @@ public class ListNoteFragment extends Fragment {
         // Required empty public constructor
     }
 
-    public static ListNoteFragment newInstance(String param1, String param2) {
+    public static ListNoteFragment newInstance() {
         ListNoteFragment fragment = new ListNoteFragment();
         Bundle args = new Bundle();
         fragment.setArguments(args);
@@ -75,12 +75,9 @@ public class ListNoteFragment extends Fragment {
             tv.setText(note.getTitle());
             tv.setTextSize(20);
             layoutView.addView(tv);
-            tv.setOnClickListener(new View.OnClickListener() {
-                @Override
-                public void onClick(View v) {
-                    mId = note.getId();
-                    showNote(mId);
-                }
+            tv.setOnClickListener(v -> {
+                mId = note.getId();
+                showNote(mId);
             });
         }
     }

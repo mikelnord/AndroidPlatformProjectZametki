@@ -55,12 +55,10 @@ public class NoteFragment extends Fragment {
             mDatePicker = v.findViewById(R.id.datePicker);
             Calendar calendar = new GregorianCalendar();
             calendar.setTime(note.getDate());
-            mDatePicker.init(calendar.get(calendar.YEAR), calendar.get(calendar.MONTH), calendar.get(calendar.DAY_OF_MONTH), new DatePicker.OnDateChangedListener() {
-                public void onDateChanged(DatePicker datePicker, int year, int monthOfYear, int dayOfMonth) {
-                    calendar.set(datePicker.getYear(),datePicker.getMonth(),datePicker.getDayOfMonth());
-                    note.setDate(calendar.getTime());
+            mDatePicker.init(calendar.get(calendar.YEAR), calendar.get(calendar.MONTH), calendar.get(calendar.DAY_OF_MONTH), (datePicker, year, monthOfYear, dayOfMonth) -> {
+                calendar.set(datePicker.getYear(),datePicker.getMonth(),datePicker.getDayOfMonth());
+                note.setDate(calendar.getTime());
 
-                }
             });
 
         }
