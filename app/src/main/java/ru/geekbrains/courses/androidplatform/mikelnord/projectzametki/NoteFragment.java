@@ -7,8 +7,12 @@ import androidx.fragment.app.Fragment;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.DatePicker;
 import android.widget.EditText;
 
+import java.util.Calendar;
+import java.util.Date;
+import java.util.GregorianCalendar;
 import java.util.UUID;
 
 public class NoteFragment extends Fragment {
@@ -18,6 +22,7 @@ public class NoteFragment extends Fragment {
     private UUID id;
     private EditText mTitleField;
     private EditText mDescriptionField;
+    private DatePicker mDatePicker;
 
     public NoteFragment() {
     }
@@ -47,6 +52,17 @@ public class NoteFragment extends Fragment {
             mTitleField.setText(note.getTitle());
             mDescriptionField = v.findViewById(R.id.note_description);
             mDescriptionField.setText(note.getDescription());
+            mDatePicker = v.findViewById(R.id.datePicker);
+            Calendar calendar = new GregorianCalendar();
+            calendar.setTime(note.getDate());
+            mDatePicker.init(calendar.get(calendar.YEAR), calendar.get(calendar.MONTH), calendar.get(calendar.DAY_OF_MONTH), new DatePicker.OnDateChangedListener() {
+                public void onDateChanged(DatePicker datePicker, int year, int monthOfYear, int dayOfMonth) {
+                    calendar.set(datePicker.getYear(),datePicker.getMonth(),datePicker.getDayOfMonth());
+                    note.setDate(calendar.getTime());
+
+                }
+            });
+
         }
         return v;
     }

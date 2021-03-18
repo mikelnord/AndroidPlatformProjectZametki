@@ -59,9 +59,7 @@ public class ListNoteFragment extends Fragment {
         super.onActivityCreated(savedInstanceState);
         isLandscape = getResources().getConfiguration().orientation == Configuration.ORIENTATION_LANDSCAPE;
         if (savedInstanceState != null) {
-            // Восстановление текущей позиции.
             mId = (UUID) savedInstanceState.getSerializable(CURRENT_ID);
-
         } else {
             if (isLandscape) {
                 showLandNote(mNoteList.getElement(0).getId());
