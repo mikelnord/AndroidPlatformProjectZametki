@@ -1,6 +1,5 @@
 package ru.geekbrains.courses.androidplatform.mikelnord.projectzametki;
 
-import android.content.Intent;
 import android.content.res.Configuration;
 import android.os.Bundle;
 
@@ -16,7 +15,6 @@ import android.view.ViewGroup;
 import android.widget.LinearLayout;
 import android.widget.TextView;
 
-import java.util.List;
 import java.util.UUID;
 
 public class ListNoteFragment extends Fragment {
@@ -101,10 +99,13 @@ public class ListNoteFragment extends Fragment {
     }
 
     private void showPortNote(UUID index) {
-        Intent intent = new Intent();
-        intent.setClass(getActivity(), ActivityNote.class);
-        intent.putExtra(ActivityNote.EXTRA_ID, index);
-        startActivity(intent);
+        NoteFragment noteFragment = NoteFragment.newInstance(index);
+        FragmentManager fragmentManager = requireActivity().getSupportFragmentManager();
+        fragmentManager.beginTransaction()
+                .replace(R.id.fragment_container, noteFragment)
+                .setTransition(FragmentTransaction.TRANSIT_FRAGMENT_FADE)
+                .addToBackStack(null)
+                .commit();
     }
 
     @Override

@@ -11,7 +11,6 @@ import android.widget.DatePicker;
 import android.widget.EditText;
 
 import java.util.Calendar;
-import java.util.Date;
 import java.util.GregorianCalendar;
 import java.util.UUID;
 
@@ -56,11 +55,9 @@ public class NoteFragment extends Fragment {
             Calendar calendar = new GregorianCalendar();
             calendar.setTime(note.getDate());
             mDatePicker.init(calendar.get(calendar.YEAR), calendar.get(calendar.MONTH), calendar.get(calendar.DAY_OF_MONTH), (datePicker, year, monthOfYear, dayOfMonth) -> {
-                calendar.set(datePicker.getYear(),datePicker.getMonth(),datePicker.getDayOfMonth());
+                calendar.set(datePicker.getYear(), datePicker.getMonth(), datePicker.getDayOfMonth());
                 note.setDate(calendar.getTime());
-
             });
-
         }
         return v;
     }
