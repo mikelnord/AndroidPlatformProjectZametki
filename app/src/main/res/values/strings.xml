@@ -1,0 +1,6 @@
+<resources>
+    <string name="app_name">ProjectZametki</string>
+    <string name="note_title_label">Title note</string>
+    <string name="note_description_label">Description note</string>
+    <string name="button_ok">Ok</string>
+</resources>
