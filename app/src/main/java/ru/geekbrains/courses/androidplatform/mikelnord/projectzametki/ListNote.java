@@ -17,7 +17,7 @@ public class ListNote {
 
     private ListNote() {
         mNotes = new ArrayList<>();
-        for (int i = 0; i < 10; i++) {
+        for (int i = 0; i < 40; i++) {
             Note note = new Note();
             note.setTitle("Note #" + i);
             note.setDescription("Description " + i);
