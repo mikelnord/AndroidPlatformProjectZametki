@@ -65,7 +65,7 @@ public class ListNoteFragment extends Fragment {
         List<Note> notes = listNote.getNotes();
         mAdapter = new NoteAdapter(notes);
         mRecyclerView.setAdapter(mAdapter);
-        DividerItemDecoration itemDecoration = new DividerItemDecoration(getContext(),  LinearLayoutManager.VERTICAL);
+        DividerItemDecoration itemDecoration = new DividerItemDecoration(getContext(), LinearLayoutManager.VERTICAL);
         itemDecoration.setDrawable(getResources().getDrawable(R.drawable.separator, null));
         mRecyclerView.addItemDecoration(itemDecoration);
 
@@ -97,6 +97,9 @@ public class ListNoteFragment extends Fragment {
         isLandscape = getResources().getConfiguration().orientation == Configuration.ORIENTATION_LANDSCAPE;
         if (savedInstanceState != null) {
             mId = (UUID) savedInstanceState.getSerializable(CURRENT_ID);
+            if (isLandscape) {
+                showLandNote(mId);
+            }
         } else {
             if (isLandscape) {
                 showLandNote(mNoteList.getElement(0).getId());

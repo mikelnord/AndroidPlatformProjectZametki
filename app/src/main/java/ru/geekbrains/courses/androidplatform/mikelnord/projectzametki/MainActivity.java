@@ -36,7 +36,7 @@ public class MainActivity extends AppCompatActivity {
             if (fragment == null) {
                 fragment = new ListNoteFragment();
                 fragmentManager.beginTransaction()
-                        .add(R.id.fragment_container, fragment)
+                        .replace(R.id.fragment_container, fragment)
                         .commit();
             }
         }
