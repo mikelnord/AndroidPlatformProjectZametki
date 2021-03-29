@@ -1,29 +1,33 @@
 package ru.geekbrains.courses.androidplatform.mikelnord.projectzametki;
 
 import android.os.Bundle;
-
-import androidx.fragment.app.Fragment;
-
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
-import android.widget.DatePicker;
-import android.widget.EditText;
+import android.widget.TextView;
 
-import java.util.Calendar;
-import java.util.GregorianCalendar;
+import androidx.annotation.NonNull;
+import androidx.fragment.app.Fragment;
+
 import java.util.UUID;
 
 public class NoteFragment extends Fragment {
 
     private static final String ARG_INDEX = "index";
+    private static final String UUID_INDEX = "uuid_index";
     private ListNote mListNote;
     private UUID id;
-    private EditText mTitleField;
-    private EditText mDescriptionField;
-    private DatePicker mDatePicker;
+    private TextView mTitleField;
+    private TextView mDescriptionField;
+    private TextView mDateField;
 
     public NoteFragment() {
+    }
+
+    @Override
+    public void onSaveInstanceState(@NonNull Bundle outState) {
+        super.onSaveInstanceState(outState);
+        outState.putSerializable(UUID_INDEX, id);
     }
 
     public static NoteFragment newInstance(UUID id) {
@@ -37,27 +41,26 @@ public class NoteFragment extends Fragment {
     @Override
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
+//        setRetainInstance(true);
         id = (UUID) getArguments().getSerializable(ARG_INDEX);
         mListNote = ListNote.get();
     }
 
     @Override
-    public View onCreateView(LayoutInflater inflater, ViewGroup container,
-                             Bundle savedInstanceState) {
+    public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
+        if (savedInstanceState != null) {
+            id = (UUID) savedInstanceState.getSerializable(UUID_INDEX);
+        }
         View v = inflater.inflate(R.layout.fragment_note, container, false);
+        setHasOptionsMenu(true);
         Note note = mListNote.getNote(id);
         if (note != null) {
             mTitleField = v.findViewById(R.id.note_title);
             mTitleField.setText(note.getTitle());
             mDescriptionField = v.findViewById(R.id.note_description);
             mDescriptionField.setText(note.getDescription());
-            mDatePicker = v.findViewById(R.id.datePicker);
-            Calendar calendar = new GregorianCalendar();
-            calendar.setTime(note.getDate());
-            mDatePicker.init(calendar.get(calendar.YEAR), calendar.get(calendar.MONTH), calendar.get(calendar.DAY_OF_MONTH), (datePicker, year, monthOfYear, dayOfMonth) -> {
-                calendar.set(datePicker.getYear(), datePicker.getMonth(), datePicker.getDayOfMonth());
-                note.setDate(calendar.getTime());
-            });
+            mDateField = v.findViewById(R.id.note_date);
+            mDateField.setText(note.getDate().toString());
         }
         return v;
     }

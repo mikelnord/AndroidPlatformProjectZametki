@@ -38,11 +38,27 @@ public class ListNote {
         return null;
     }
 
-    public Note getElement(int i){
+    public Note getElement(int i) {
         return mNotes.get(i);
     }
 
-    public int getSize(){
+    public void deleteNoteData(Note note) {
+        mNotes.remove(note);
+    }
+
+    public void updateNote(int position, Note note) {
+        mNotes.set(position, note);
+    }
+
+    public void addNoteData(Note note) {
+        mNotes.add(note);
+    }
+
+    public void clearNoteList() {
+        mNotes.clear();
+    }
+
+    public int getSize() {
         return mNotes.size();
     }
 }

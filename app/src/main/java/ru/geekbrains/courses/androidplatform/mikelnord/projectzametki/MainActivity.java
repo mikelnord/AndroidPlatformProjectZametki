@@ -8,7 +8,7 @@ import androidx.core.view.GravityCompat;
 import androidx.drawerlayout.widget.DrawerLayout;
 import androidx.fragment.app.Fragment;
 import androidx.fragment.app.FragmentManager;
-import androidx.fragment.app.FragmentTransaction;
+
 
 import android.content.res.Configuration;
 import android.os.Bundle;
@@ -18,9 +18,12 @@ import android.widget.Toast;
 
 import com.google.android.material.navigation.NavigationView;
 
-import java.util.UUID;
 
 public class MainActivity extends AppCompatActivity {
+
+    private Publisher publisher = new Publisher();
+    private Navigation navigation;
+
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -29,6 +32,7 @@ public class MainActivity extends AppCompatActivity {
         Toolbar toolbar = findViewById(R.id.toolbar);
         setSupportActionBar(toolbar);
         initDrawer(toolbar);
+        navigation = new Navigation(getSupportFragmentManager());
 
         if (getResources().getConfiguration().orientation != Configuration.ORIENTATION_LANDSCAPE) {
             FragmentManager fragmentManager = getSupportFragmentManager();
@@ -84,7 +88,6 @@ public class MainActivity extends AppCompatActivity {
                 Toast.makeText(MainActivity.this, query, Toast.LENGTH_SHORT).show();
                 return true;
             }
-
             @Override
             public boolean onQueryTextChange(String newText) {
                 return true;
@@ -101,4 +104,15 @@ public class MainActivity extends AppCompatActivity {
         }
         return super.onOptionsItemSelected(item);
     }
+
+    public Publisher getPublisher() {
+        return publisher;
+    }
+
+    public Navigation getNavigation() {
+        if (navigation==null)
+            return new Navigation(getSupportFragmentManager());
+        else return navigation;
+    }
+
 }

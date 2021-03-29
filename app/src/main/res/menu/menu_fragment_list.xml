@@ -7,5 +7,11 @@
         android:orderInCategory="30"
         android:title="@string/add"
         app:showAsAction="never" />
+    <item
+        android:id="@+id/action_clear"
+        android:icon="@android:drawable/ic_notification_clear_all"
+        android:orderInCategory="150"
+        android:title="@string/clear"
+        app:showAsAction="never" />
 </menu>
 

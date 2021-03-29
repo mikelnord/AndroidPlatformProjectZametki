@@ -13,4 +13,6 @@
     <string name="avataruser">AvatarUser</string>
     <string name="testuser">TestUser</string>
     <string name="note_date_label">Date</string>
+    <string name="clear">Clear list</string>
+    <string name="edit">Edit</string>
 </resources>
