@@ -13,15 +13,15 @@ public class Note implements Parcelable {
     private Date mDate;
 
     public Note() {
-        mId=UUID.randomUUID();
-        mDate=new Date();
+        mId = UUID.randomUUID();
+        mDate = new Date();
     }
 
     protected Note(Parcel in) {
-        mId= (UUID) in.readSerializable();
+        mId = (UUID) in.readSerializable();
         mTitle = in.readString();
         mDescription = in.readString();
-        mDate=new Date(in.readLong());
+        mDate = new Date(in.readLong());
     }
 
     public Note(UUID id, String title, String description, Date date) {

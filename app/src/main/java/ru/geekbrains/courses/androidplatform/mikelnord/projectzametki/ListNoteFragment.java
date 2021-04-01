@@ -3,6 +3,7 @@ package ru.geekbrains.courses.androidplatform.mikelnord.projectzametki;
 import android.content.Context;
 import android.content.res.Configuration;
 import android.os.Bundle;
+import android.util.Log;
 import android.view.ContextMenu;
 import android.view.LayoutInflater;
 import android.view.Menu;
@@ -23,7 +24,14 @@ import androidx.recyclerview.widget.DividerItemDecoration;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 
+import com.google.android.gms.tasks.OnCompleteListener;
+import com.google.android.gms.tasks.OnFailureListener;
+import com.google.android.gms.tasks.Task;
+import com.google.firebase.firestore.QueryDocumentSnapshot;
+import com.google.firebase.firestore.QuerySnapshot;
+
 import java.util.List;
+import java.util.Map;
 import java.util.UUID;
 
 public class ListNoteFragment extends Fragment {
@@ -36,7 +44,7 @@ public class ListNoteFragment extends Fragment {
     private Publisher publisher;
     private boolean moveToLastPosition;
     private static final int MY_DEFAULT_DURATION = 1000;
-
+    private String TAG = "NotesSourceFirebaseImpl";
 
     public ListNoteFragment() {
         // Required empty public constructor
@@ -84,19 +92,43 @@ public class ListNoteFragment extends Fragment {
     private void updateUI() {
         ListNote listNote = ListNote.get();
         List<Note> notes = listNote.getNotes();
-        mAdapter = new NoteAdapter(notes);
-        mRecyclerView.setAdapter(mAdapter);
-        DividerItemDecoration itemDecoration = new DividerItemDecoration(getContext(), LinearLayoutManager.VERTICAL);
-        itemDecoration.setDrawable(getResources().getDrawable(R.drawable.separator, null));
-        mRecyclerView.addItemDecoration(itemDecoration);
-        DefaultItemAnimator animator = new DefaultItemAnimator();
-        animator.setAddDuration(MY_DEFAULT_DURATION);
-        animator.setRemoveDuration(MY_DEFAULT_DURATION);
-        mRecyclerView.setItemAnimator(animator);
-        if (moveToLastPosition) {
-            mRecyclerView.smoothScrollToPosition(mNoteList.getSize() - 1);
-            moveToLastPosition = false;
-        }
+        notes.clear();
+        listNote.getCollection().get()
+                .addOnCompleteListener(new OnCompleteListener<QuerySnapshot>() {
+                    @Override
+                    public void onComplete(@NonNull Task<QuerySnapshot> task) {
+                        if (task.isSuccessful()) {
+                            for (QueryDocumentSnapshot document : task.getResult()) {
+                                Map<String, Object> doc = document.getData();
+                                String id = document.getId();
+                                Note note = NoteDataMapping.toNoteData(id, doc);
+                                notes.add(note);
+                            }
+                            mAdapter = new NoteAdapter(notes);
+                            mRecyclerView.setAdapter(mAdapter);
+                            DividerItemDecoration itemDecoration = new DividerItemDecoration(getContext(), LinearLayoutManager.VERTICAL);
+                            itemDecoration.setDrawable(getResources().getDrawable(R.drawable.separator, null));
+                            mRecyclerView.addItemDecoration(itemDecoration);
+                            DefaultItemAnimator animator = new DefaultItemAnimator();
+                            animator.setAddDuration(MY_DEFAULT_DURATION);
+                            animator.setRemoveDuration(MY_DEFAULT_DURATION);
+                            mRecyclerView.setItemAnimator(animator);
+                            if (moveToLastPosition) {
+                                mRecyclerView.smoothScrollToPosition(mNoteList.getSize() - 1);
+                                moveToLastPosition = false;
+                            }
+                            Log.d(TAG, "success " + notes.size() + " qnt");
+                        } else {
+                            Log.d(TAG, "get failed with ", task.getException());
+                        }
+                    }
+                })
+                .addOnFailureListener(new OnFailureListener() {
+                    @Override
+                    public void onFailure(@NonNull Exception e) {
+                        Log.d(TAG, "get failed with ", e);
+                    }
+                });
     }
 
     @Override
@@ -196,8 +228,9 @@ public class ListNoteFragment extends Fragment {
             contextMenu.add("Delete").setOnMenuItemClickListener(new MenuItem.OnMenuItemClickListener() {
                 @Override
                 public boolean onMenuItemClick(MenuItem item) {
-                    mNoteList.deleteNoteData(mNote);
-                    mAdapter.notifyItemRemoved(getLayoutPosition());
+                    int position = getLayoutPosition();
+                    mNoteList.deleteNoteData(position);
+                    mAdapter.notifyItemRemoved(position);
                     return true;
                 }
             });
@@ -208,8 +241,8 @@ public class ListNoteFragment extends Fragment {
                     publisher.subscribe(new Observer() {
                         @Override
                         public void updateNoteData(Note note) {
-                            int position=getLayoutPosition();
-                            mNoteList.updateNote(position,note);
+                            int position = getLayoutPosition();
+                            mNoteList.updateNote(position, note);
                             mAdapter.notifyItemChanged(position);
                         }
                     });

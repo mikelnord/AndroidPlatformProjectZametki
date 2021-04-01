@@ -1,0 +1,39 @@
+{
+  "project_info": {
+    "project_number": "956605407470",
+    "project_id": "projectzametki-18571",
+    "storage_bucket": "projectzametki-18571.appspot.com"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:956605407470:android:87e415c3aae353310a13ff",
+        "android_client_info": {
+          "package_name": "ru.geekbrains.courses.androidplatform.mikelnord"
+        }
+      },
+      "oauth_client": [
+        {
+          "client_id": "956605407470-vq3qrt6gp3g3n1o4s5jcv2bunfnv6vut.apps.googleusercontent.com",
+          "client_type": 3
+        }
+      ],
+      "api_key": [
+        {
+          "current_key": "AIzaSyAt6ZCD16-G4-wwouIKy56cAf5g2J1wkeo"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": [
+            {
+              "client_id": "956605407470-vq3qrt6gp3g3n1o4s5jcv2bunfnv6vut.apps.googleusercontent.com",
+              "client_type": 3
+            }
+          ]
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}
