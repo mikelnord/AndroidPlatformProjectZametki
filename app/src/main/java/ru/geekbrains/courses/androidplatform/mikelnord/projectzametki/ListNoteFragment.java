@@ -1,6 +1,7 @@
 package ru.geekbrains.courses.androidplatform.mikelnord.projectzametki;
 
 import android.content.Context;
+import android.content.DialogInterface;
 import android.content.res.Configuration;
 import android.os.Bundle;
 import android.util.Log;
@@ -16,6 +17,7 @@ import android.widget.Toast;
 
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
+import androidx.appcompat.app.AlertDialog;
 import androidx.fragment.app.Fragment;
 import androidx.fragment.app.FragmentManager;
 import androidx.fragment.app.FragmentTransaction;
@@ -94,41 +96,33 @@ public class ListNoteFragment extends Fragment {
         List<Note> notes = listNote.getNotes();
         notes.clear();
         listNote.getCollection().get()
-                .addOnCompleteListener(new OnCompleteListener<QuerySnapshot>() {
-                    @Override
-                    public void onComplete(@NonNull Task<QuerySnapshot> task) {
-                        if (task.isSuccessful()) {
-                            for (QueryDocumentSnapshot document : task.getResult()) {
-                                Map<String, Object> doc = document.getData();
-                                String id = document.getId();
-                                Note note = NoteDataMapping.toNoteData(id, doc);
-                                notes.add(note);
-                            }
-                            mAdapter = new NoteAdapter(notes);
-                            mRecyclerView.setAdapter(mAdapter);
-                            DividerItemDecoration itemDecoration = new DividerItemDecoration(getContext(), LinearLayoutManager.VERTICAL);
-                            itemDecoration.setDrawable(getResources().getDrawable(R.drawable.separator, null));
-                            mRecyclerView.addItemDecoration(itemDecoration);
-                            DefaultItemAnimator animator = new DefaultItemAnimator();
-                            animator.setAddDuration(MY_DEFAULT_DURATION);
-                            animator.setRemoveDuration(MY_DEFAULT_DURATION);
-                            mRecyclerView.setItemAnimator(animator);
-                            if (moveToLastPosition) {
-                                mRecyclerView.smoothScrollToPosition(mNoteList.getSize() - 1);
-                                moveToLastPosition = false;
-                            }
-                            Log.d(TAG, "success " + notes.size() + " qnt");
-                        } else {
-                            Log.d(TAG, "get failed with ", task.getException());
+                .addOnCompleteListener(task -> {
+                    if (task.isSuccessful()) {
+                        for (QueryDocumentSnapshot document : task.getResult()) {
+                            Map<String, Object> doc = document.getData();
+                            String id = document.getId();
+                            Note note = NoteDataMapping.toNoteData(id, doc);
+                            notes.add(note);
                         }
+                        mAdapter = new NoteAdapter(notes);
+                        mRecyclerView.setAdapter(mAdapter);
+                        DividerItemDecoration itemDecoration = new DividerItemDecoration(getContext(), LinearLayoutManager.VERTICAL);
+                        itemDecoration.setDrawable(getResources().getDrawable(R.drawable.separator, null));
+                        mRecyclerView.addItemDecoration(itemDecoration);
+                        DefaultItemAnimator animator = new DefaultItemAnimator();
+                        animator.setAddDuration(MY_DEFAULT_DURATION);
+                        animator.setRemoveDuration(MY_DEFAULT_DURATION);
+                        mRecyclerView.setItemAnimator(animator);
+                        if (moveToLastPosition) {
+                            mRecyclerView.smoothScrollToPosition(mNoteList.getSize() - 1);
+                            moveToLastPosition = false;
+                        }
+                        Log.d(TAG, "success " + notes.size() + " qnt");
+                    } else {
+                        Log.d(TAG, "get failed with ", task.getException());
                     }
                 })
-                .addOnFailureListener(new OnFailureListener() {
-                    @Override
-                    public void onFailure(@NonNull Exception e) {
-                        Log.d(TAG, "get failed with ", e);
-                    }
-                });
+                .addOnFailureListener(e -> Log.d(TAG, "get failed with ", e));
     }
 
     @Override
@@ -140,13 +134,10 @@ public class ListNoteFragment extends Fragment {
     public boolean onOptionsItemSelected(@NonNull MenuItem item) {
         if (item.getItemId() == R.id.action_add) {
             navigation.addFragment(NoteFragmentEdit.newInstance(), true, getResources().getConfiguration().orientation);
-            publisher.subscribe(new Observer() {
-                @Override
-                public void updateNoteData(Note note) {
-                    mNoteList.addNoteData(note);
-                    mAdapter.notifyItemInserted(mNoteList.getSize() - 1);
-                    moveToLastPosition = true;
-                }
+            publisher.subscribe(note -> {
+                mNoteList.addNoteData(note);
+                mAdapter.notifyItemInserted(mNoteList.getSize() - 1);
+                moveToLastPosition = true;
             });
             return true;
         }
@@ -225,29 +216,29 @@ public class ListNoteFragment extends Fragment {
         @Override
         public void onCreateContextMenu(ContextMenu contextMenu, View view, ContextMenu.ContextMenuInfo contextMenuInfo) {
             contextMenu.setHeaderTitle("Select action");
-            contextMenu.add("Delete").setOnMenuItemClickListener(new MenuItem.OnMenuItemClickListener() {
-                @Override
-                public boolean onMenuItemClick(MenuItem item) {
-                    int position = getLayoutPosition();
-                    mNoteList.deleteNoteData(position);
-                    mAdapter.notifyItemRemoved(position);
-                    return true;
-                }
-            });
-            contextMenu.add("Edit").setOnMenuItemClickListener(new MenuItem.OnMenuItemClickListener() {
-                @Override
-                public boolean onMenuItemClick(MenuItem item) {
-                    navigation.addFragment(NoteFragmentEdit.newInstance(mNote), true, getResources().getConfiguration().orientation);
-                    publisher.subscribe(new Observer() {
-                        @Override
-                        public void updateNoteData(Note note) {
+            contextMenu.add("Delete").setOnMenuItemClickListener(item -> {
+                AlertDialog.Builder builder = new AlertDialog.Builder(view.getContext(), android.R.style.Theme_Material_Dialog_Alert);
+                builder.setTitle("Delete entry")
+                        .setMessage("Are you sure you want to delete this entry?")
+                        .setPositiveButton("YES", (dialog, which) -> {
                             int position = getLayoutPosition();
-                            mNoteList.updateNote(position, note);
-                            mAdapter.notifyItemChanged(position);
-                        }
-                    });
-                    return true;
-                }
+                            mNoteList.deleteNoteData(position);
+                            mAdapter.notifyItemRemoved(position);
+                        })
+                        .setNegativeButton("NO", (dialog, which) -> {
+                        })
+                        .setIcon(android.R.drawable.ic_dialog_alert)
+                        .show()
+                return true;
+            });
+            contextMenu.add("Edit").setOnMenuItemClickListener(item -> {
+                navigation.addFragment(NoteFragmentEdit.newInstance(mNote), true, getResources().getConfiguration().orientation);
+                publisher.subscribe(note -> {
+                    int position = getLayoutPosition();
+                    mNoteList.updateNote(position, note);
+                    mAdapter.notifyItemChanged(position);
+                });
+                return true;
             });
         }
     }
